@@ -52,3 +52,10 @@
 .blue-col {
   background-color: rgb(78, 78, 220);
 }
+
+
+* {
+  ::-webkit-scrollbar {
+    width: 2px;
+  }
+}
