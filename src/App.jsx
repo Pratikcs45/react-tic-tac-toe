@@ -65,7 +65,7 @@ function App() {
 
 
   return (
-    <div className="game" class='row col-12 flex  justify-center items-center  space-x-[200px] '>
+    <div className="game" class='flex  justify-center items-center  gap-x-[200px] max-md:flex-col h-screen max-md:gap-y-4'>
       <div className="game-board">
         <Board xIsNext={xIsNext} squares={currentSquares} onPlay={handlePlay} />
       </div>
