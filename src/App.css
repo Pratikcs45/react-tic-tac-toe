@@ -1,0 +1,54 @@
+.screen {
+  height: 100vh;
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  row-gap: 20px;
+}
+
+.board-row {
+  width: 200px;
+  padding: 18px;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  column-gap: 20px;
+  row-gap: 20px;
+  border-radius: 10px;
+
+  border: 2px solid black;
+}
+
+.board-row-2 {
+  width: 300px;
+  text-align: center;
+  column-gap: 20px;
+  border-radius: 10px;
+  border: 2px solid black;
+  overflow-y: auto;
+  height: 251px;
+}
+
+.square {
+  border: 2px solid #151515b9;
+  transition: all 0.2s ease-in;
+  border-radius: 10px;
+  padding: 2px 4px;
+  height: 40px;
+
+}
+
+.square:hover {
+  background-color: #151515;
+  color: white;
+
+}
+
+.red-col {
+  background-color: rgb(239, 70, 70);
+}
+
+.blue-col {
+  background-color: rgb(78, 78, 220);
+}
