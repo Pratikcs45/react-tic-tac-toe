@@ -9,8 +9,15 @@ import './App.css'
 function App() {
 
   const [xIsNext, setXIsNext] = useState(true);
+
   const [history, setHistory] = useState([Array(9).fill(null)]);
   const [currentMove, setCurrentMove] = useState(0);
+
+
+  const [winner, setWinner] = useState(null)
+
+  const [isGameOver, setIsGameOver] = useState(false)
+
 
   const currentSquares = history[currentMove];
 
@@ -20,12 +27,13 @@ function App() {
     const nextHistory = [...history.slice(0, currentMove + 1), nextSquares];
     setHistory(nextHistory);
     setCurrentMove(nextHistory.length - 1);
-
     setXIsNext(!xIsNext);
 
   }
 
   function jumpTo(nextMove) {
+    setIsGameOver(false)
+    setWinner(null)
     setCurrentMove(nextMove);
     setXIsNext(nextMove % 2 === 0);
 
@@ -40,8 +48,11 @@ function App() {
     } else {
       description = 'Go to game start';
     }
+
+    const moveEven = move > 0 ? move % 2 : 1;
+
     return (
-      <li className={`mx-4 my-2 rounded-md py-2 ${move === currentMove ? "bg-black text-white" : "bg-white text-black"}`} key={move}>
+      <li className={`mx-4 my-2 rounded-md py-2 ${move === currentMove ? "bg-black text-white" : "bg-white text-black"} ${moveEven === 0 ? "hidden" : ""}`} key={move}>
         <button onClick={() => jumpTo(move)}>{description}</button>
       </li>
     );
@@ -65,10 +76,10 @@ function App() {
 
 
   return (
-    <div className="game" class='flex  justify-center items-center  gap-x-[200px] max-md:flex-col h-screen max-md:gap-y-4'>
+    <div className="game flex  justify-center items-center  gap-x-[200px] max-md:flex-col h-screen max-md:gap-y-4">
       <div className="game-board">
-        <Board xIsNext={xIsNext} squares={currentSquares} onPlay={handlePlay} />
-      </div>
+        < Board xIsNext={xIsNext} squares={currentSquares} currentMove={currentMove} onPlay={handlePlay} board={history} isGameOver={isGameOver} winner={winner} setWinner={setWinner} setIsGameOver={setIsGameOver} />
+      </div >
 
       <div className='board-row-2'>
         <ol className='moves-list'>{moveState}</ol>
@@ -76,13 +87,13 @@ function App() {
         <p className='h-16'></p>
       </div>
 
-    </div>
+    </div >
   );
 
 
 }
 
-const Board = ({ xIsNext, squares, onPlay }) => {
+const Board = ({ xIsNext, squares, onPlay, board, isGameOver, setIsGameOver, setWinner, winner, currentMove }) => {
 
 
   const [isDraw, setIsDraw] = useState(false)
@@ -91,16 +102,32 @@ const Board = ({ xIsNext, squares, onPlay }) => {
 
 
 
+  useEffect(() => {
+    const winner = calculateWinner(squares);
 
-  const winner = calculateWinner(squares);
+    if (winner) {
+      setIsGameOver(true)
+      setWinner(winner)
+    }
+
+  }, [board, squares, xIsNext])
+
+
+
+
+
+
   let status;
   if (winner) {
     status = "Winner: " + winner;
   } else {
-    status = "Next player: " + (xIsNext ? "X" : "O");
+    status = "Next player: " + (xIsNext ? "X" : "CPU");
   }
 
   useEffect(() => {
+
+    const winner = calculateWinner(squares);
+
 
     if (!winner) {
       let draw = true;
@@ -114,8 +141,12 @@ const Board = ({ xIsNext, squares, onPlay }) => {
 
   const handleClick = (i) => {
 
+    const winner = calculateWinner(squares);
+
+
+
     const nextSquares = squares.slice();
-    if (!nextSquares[i] && !calculateWinner(squares)) {
+    if (!nextSquares[i] && !winner) {
 
       if (xIsNext) {
         nextSquares[i] = "X";
@@ -128,6 +159,39 @@ const Board = ({ xIsNext, squares, onPlay }) => {
 
   }
 
+  function generateRandomNumber() {
+    let numerGenrated = Math.floor(Math.random() * 9)
+    return numerGenrated
+  }
+
+
+  useEffect(() => {
+    const winner = calculateWinner(squares);
+
+    let draw = true;
+    squares.map(el => {
+      if (el === null) draw = false
+    })
+
+
+    if (!xIsNext && !winner && !draw) {
+      let randomNumber = generateRandomNumber();
+      const nextSquares = squares.slice();
+      let isRandomProper = false
+      while (isRandomProper === false && !isGameOver) {
+        if (!nextSquares[randomNumber]) {
+          nextSquares[randomNumber] = "O"
+          onPlay(nextSquares);
+          isRandomProper = true
+        } else {
+          randomNumber = generateRandomNumber()
+        }
+      }
+    }
+
+
+  }, [xIsNext, currentMove])
+
 
   return (
     <div className='screen'>
@@ -135,11 +199,9 @@ const Board = ({ xIsNext, squares, onPlay }) => {
 
       {isDraw && <div>Match Is Draw</div>}
       {!isDraw && <div className="status">{status}</div>}
-      <div class='row col-12 flex  justify-center  space-x-[200px] '>
+      <div className='row col-12 flex  justify-center  space-x-[200px] '>
 
-        {/* <div className='board-row-2'>
-          <ol>{movess}</ol>
-        </div> */}
+
         <div className="board-row ">
           <Square value={squares[0]} onSquareClick={() => handleClick(0)} />
           <Square value={squares[1]} onSquareClick={() => handleClick(1)} />
